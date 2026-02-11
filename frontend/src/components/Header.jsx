@@ -40,9 +40,7 @@ const Header = ({ title, subtitle }) => {
             <span className="user-name">{user?.name || 'User'}</span>
             <span className="user-role">{user?.role || 'Student'}</span>
           </div>
-          <button className="notification-btn">
-            <FiBell />
-          </button>
+
         </div>
       </div>
     </div>
