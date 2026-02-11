@@ -63,4 +63,14 @@ api.interceptors.response.use(
   }
 );
 
+export const createCollege = async (collegeData) => {
+  const response = await api.post('/colleges', collegeData);
+  return response;
+};
+
+export const getColleges = async () => {
+  const response = await api.get('/colleges');
+  return response;
+};
+
 export default api;

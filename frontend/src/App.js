@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard';
 import Notes from './pages/Notes';
 import Requests from './pages/Requests';
 import Profile from './pages/Profile';
+import Colleges from './pages/Colleges';
+import Upload from './pages/Upload';
 import './App.css';
 
 function App() {
@@ -88,6 +90,22 @@ function App() {
             element={
               isAuthenticated ? 
               <Profile onLogout={handleLogout} /> : 
+              <Navigate to="/login" />
+            } 
+          />
+          <Route 
+            path="/colleges" 
+            element={
+              isAuthenticated ? 
+              <Colleges onLogout={handleLogout} /> : 
+              <Navigate to="/login" />
+            } 
+          />
+          <Route 
+            path="/upload" 
+            element={
+              isAuthenticated ? 
+              <Upload onLogout={handleLogout} /> : 
               <Navigate to="/login" />
             } 
           />

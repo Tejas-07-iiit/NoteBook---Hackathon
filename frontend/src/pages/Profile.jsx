@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import api from '../services/api';
-import { FiUser, FiMail, FiBook, FiEdit, FiSave, FiKey } from 'react-icons/fi';
+import { FiUser, FiMail, FiBook, FiEdit, FiSave, FiKey, FiFileText, FiClock, FiCheck, FiX } from 'react-icons/fi';
 
 const Profile = ({ onLogout }) => {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [colleges, setColleges] = useState([]);
+  const [userRequests, setUserRequests] = useState([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
   
   // Get user from localStorage
   const userData = localStorage.getItem('user');
@@ -33,6 +35,10 @@ const Profile = ({ onLogout }) => {
         email: user.email || '',
         collegeId: user.collegeId || ''
       });
+      // Fetch user requests if student
+      if (user.role === 'student') {
+        fetchUserRequests();
+      }
     }
     fetchColleges();
   }, [user]);
@@ -43,6 +49,18 @@ const Profile = ({ onLogout }) => {
       setColleges(response);
     } catch (error) {
       console.error('Error fetching colleges:', error);
+    }
+  };
+
+  const fetchUserRequests = async () => {
+    try {
+      setLoadingRequests(true);
+      const response = await api.get('/requests/my');
+      setUserRequests(response);
+    } catch (error) {
+      console.error('Error fetching user requests:', error);
+    } finally {
+      setLoadingRequests(false);
     }
   };
 
@@ -106,10 +124,31 @@ const Profile = ({ onLogout }) => {
     return college ? `${college.collegeName} (${college.collegeCode})` : 'Loading...';
   };
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'approved': return <FiCheck style={{ color: '#10b981', marginRight: '4px' }} />;
+      case 'rejected': return <FiX style={{ color: '#ef4444', marginRight: '4px' }} />;
+      default: return <FiClock style={{ color: '#f59e0b', marginRight: '4px' }} />;
+    }
+  };
+
+  // Get role badge style
+  const getRoleBadgeStyle = () => {
+    if (user?.role === 'admin') {
+      return { background: '#fee2e2', color: '#991b1b' };
+    } else if (user?.role === 'teacher') {
+      return { background: '#dbeafe', color: '#1e40af' };
+    } else {
+      return { background: '#d1fae5', color: '#065f46' };
+    }
+  };
+
+  const roleBadgeStyle = getRoleBadgeStyle();
+
   if (!user) {
     return (
-      <div className="loading-screen">
-        <div className="spinner"></div>
+      <div style={styles.loadingScreen}>
+        <div style={styles.spinner}></div>
         <p>Loading profile...</p>
       </div>
     );
@@ -125,13 +164,13 @@ const Profile = ({ onLogout }) => {
           subtitle="Manage your account settings"
         />
         
-        <div className="profile-container">
+        <div style={styles.profileContainer}>
           {/* Profile Info Card */}
-          <div className="card">
-            <div className="card-header">
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>
               <h2>Profile Information</h2>
               <button 
-                className="btn btn-secondary"
+                style={styles.btnSecondary}
                 onClick={() => setEditMode(!editMode)}
               >
                 <FiEdit /> {editMode ? 'Cancel' : 'Edit'}
@@ -139,48 +178,48 @@ const Profile = ({ onLogout }) => {
             </div>
             
             <form onSubmit={handleUpdateProfile}>
-              <div className="form-group">
+              <div style={styles.formGroup}>
                 <label><FiUser /> Full Name</label>
                 {editMode ? (
                   <input
                     type="text"
-                    className="form-control"
+                    style={styles.formControl}
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     required
                   />
                 ) : (
-                  <div className="profile-value">{user.name}</div>
+                  <div style={styles.profileValue}>{user.name}</div>
                 )}
               </div>
               
-              <div className="form-group">
+              <div style={styles.formGroup}>
                 <label><FiMail /> Email Address</label>
                 {editMode ? (
                   <input
                     type="email"
-                    className="form-control"
+                    style={styles.formControl}
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     required
                   />
                 ) : (
-                  <div className="profile-value">{user.email}</div>
+                  <div style={styles.profileValue}>{user.email}</div>
                 )}
               </div>
               
-              <div className="form-group">
+              <div style={styles.formGroup}>
                 <label><FiBook /> Role</label>
-                <div className="profile-value role-badge">
+                <div style={{...styles.profileValue, ...styles.roleBadge, ...roleBadgeStyle}}>
                   {user.role}
                 </div>
               </div>
               
-              <div className="form-group">
+              <div style={styles.formGroup}>
                 <label><FiBook /> College</label>
                 {editMode ? (
                   <select
-                    className="form-control"
+                    style={styles.formControl}
                     value={formData.collegeId}
                     onChange={(e) => setFormData({...formData, collegeId: e.target.value})}
                     required
@@ -193,15 +232,15 @@ const Profile = ({ onLogout }) => {
                     ))}
                   </select>
                 ) : (
-                  <div className="profile-value">{getCollegeName(user.collegeId)}</div>
+                  <div style={styles.profileValue}>{getCollegeName(user.collegeId)}</div>
                 )}
               </div>
               
               {editMode && (
-                <div className="form-actions">
+                <div style={styles.formActions}>
                   <button 
                     type="submit" 
-                    className="btn btn-primary"
+                    style={loading ? styles.btnPrimaryDisabled : styles.btnPrimary}
                     disabled={loading}
                   >
                     <FiSave /> {loading ? 'Saving...' : 'Save Changes'}
@@ -212,26 +251,26 @@ const Profile = ({ onLogout }) => {
           </div>
           
           {/* Change Password Card */}
-          <div className="card">
+          <div style={styles.card}>
             <h2><FiKey /> Change Password</h2>
             
             <form onSubmit={handleChangePassword}>
-              <div className="form-group">
+              <div style={styles.formGroup}>
                 <label>Current Password</label>
                 <input
                   type="password"
-                  className="form-control"
+                  style={styles.formControl}
                   value={passwordData.currentPassword}
                   onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                   required
                 />
               </div>
               
-              <div className="form-group">
+              <div style={styles.formGroup}>
                 <label>New Password</label>
                 <input
                   type="password"
-                  className="form-control"
+                  style={styles.formControl}
                   value={passwordData.newPassword}
                   onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
                   required
@@ -239,11 +278,11 @@ const Profile = ({ onLogout }) => {
                 />
               </div>
               
-              <div className="form-group">
+              <div style={styles.formGroup}>
                 <label>Confirm New Password</label>
                 <input
                   type="password"
-                  className="form-control"
+                  style={styles.formControl}
                   value={passwordData.confirmPassword}
                   onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
                   required
@@ -251,10 +290,10 @@ const Profile = ({ onLogout }) => {
                 />
               </div>
               
-              <div className="form-actions">
+              <div style={styles.formActions}>
                 <button 
                   type="submit" 
-                  className="btn btn-primary"
+                  style={loading ? styles.btnPrimaryDisabled : styles.btnPrimary}
                   disabled={loading}
                 >
                   {loading ? 'Changing...' : 'Change Password'}
@@ -263,11 +302,11 @@ const Profile = ({ onLogout }) => {
             </form>
             
             {/* Account Actions */}
-            <div className="account-actions">
+            <div style={styles.accountActions}>
               <h3>Account Actions</h3>
               
               <button 
-                className="btn btn-secondary"
+                style={styles.btnSecondary}
                 onClick={() => {
                   if (window.confirm('Are you sure you want to logout?')) {
                     onLogout();
@@ -278,7 +317,7 @@ const Profile = ({ onLogout }) => {
               </button>
               
               <button 
-                className="btn btn-danger"
+                style={styles.btnDanger}
                 onClick={() => {
                   if (window.confirm('This will permanently delete your account. Are you sure?')) {
                     alert('Account deletion functionality would be implemented here');
@@ -292,199 +331,304 @@ const Profile = ({ onLogout }) => {
         </div>
         
         {/* User Stats */}
-        <div className="stats-card">
+        <div style={styles.statsCard}>
           <h3>Your Activity</h3>
-          <div className="stats-grid">
-            <div className="stat-item">
-              <div className="stat-value">0</div>
-              <div className="stat-label">Notes Uploaded</div>
+          <div style={styles.statsGrid}>
+            <div style={styles.statItem}>
+              <div style={styles.statValue}>0</div>
+              <div style={styles.statLabel}>Notes Uploaded</div>
             </div>
-            <div className="stat-item">
-              <div className="stat-value">0</div>
-              <div className="stat-label">Requests Made</div>
+            <div style={styles.statItem}>
+              <div style={styles.statValue}>{userRequests.length}</div>
+              <div style={styles.statLabel}>Requests Made</div>
             </div>
-            <div className="stat-item">
-              <div className="stat-value">0</div>
-              <div className="stat-label">Downloads</div>
+            <div style={styles.statItem}>
+              <div style={styles.statValue}>0</div>
+              <div style={styles.statLabel}>Downloads</div>
             </div>
           </div>
         </div>
-      </div>
 
-      <style jsx>{`
-        .profile-container {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 2rem;
-          margin-bottom: 2rem;
-        }
-        
-        @media (max-width: 1024px) {
-          .profile-container {
-            grid-template-columns: 1fr;
-          }
-        }
-        
-        .card {
-          background: white;
-          border-radius: 15px;
-          padding: 2rem;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        
-        .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 2rem;
-        }
-        
-        .form-group {
-          margin-bottom: 1.5rem;
-        }
-        
-        .form-group label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-          color: #334155;
-        }
-        
-        .form-group label svg {
-          margin-right: 8px;
-          vertical-align: middle;
-        }
-        
-        .form-control {
-          width: 100%;
-          padding: 12px 16px;
-          border: 2px solid #e2e8f0;
-          border-radius: 10px;
-          font-size: 1rem;
-        }
-        
-        .form-control:focus {
-          outline: none;
-          border-color: #4361ee;
-          box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-        
-        .profile-value {
-          padding: 12px 0;
-          color: #334155;
-          font-size: 1rem;
-        }
-        
-        .role-badge {
-          background: ${user.role === 'admin' ? '#fee2e2' : 
-                      user.role === 'teacher' ? '#dbeafe' : 
-                      '#d1fae5'};
-          color: ${user.role === 'admin' ? '#991b1b' : 
-                   user.role === 'teacher' ? '#1e40af' : 
-                   '#065f46'};
-          padding: 4px 12px;
-          border-radius: 20px;
-          display: inline-block;
-          text-transform: capitalize;
-        }
-        
-        .form-actions {
-          margin-top: 2rem;
-        }
-        
-        .account-actions {
-          margin-top: 3rem;
-          padding-top: 2rem;
-          border-top: 1px solid #e2e8f0;
-        }
-        
-        .account-actions h3 {
-          margin-bottom: 1rem;
-        }
-        
-        .account-actions button {
-          margin-right: 1rem;
-        }
-        
-        .stats-card {
-          background: white;
-          border-radius: 15px;
-          padding: 2rem;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        
-        .stats-grid {
-          display: flex;
-          gap: 2rem;
-          margin-top: 1rem;
-        }
-        
-        .stat-item {
-          text-align: center;
-        }
-        
-        .stat-value {
-          font-size: 2rem;
-          font-weight: bold;
-          color: #4361ee;
-        }
-        
-        .stat-label {
-          color: #6c757d;
-        }
-        
-        .btn {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 10px;
-          font-weight: 600;
-          cursor: pointer;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-        }
-        
-        .btn-primary {
-          background: #4361ee;
-          color: white;
-        }
-        
-        .btn-secondary {
-          background: #e2e8f0;
-          color: #334155;
-        }
-        
-        .btn-danger {
-          background: #ef4444;
-          color: white;
-        }
-        
-        .loading-screen {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          background: #f5f7fb;
-        }
-        
-        .spinner {
-          width: 40px;
-          height: 40px;
-          border: 3px solid #4361ee;
-          border-top: 3px solid transparent;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin-bottom: 1rem;
-        }
-        
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+        {/* Request History (Only for Students) */}
+        {user?.role === 'student' && (
+          <div style={{...styles.card, marginTop: '2rem'}}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
+              <FiFileText /> My Request History
+            </h3>
+            {loadingRequests ? (
+              <div style={{ textAlign: 'center', padding: '2rem' }}>
+                <div style={styles.spinner}></div>
+                <p>Loading request history...</p>
+              </div>
+            ) : userRequests.length > 0 ? (
+              <div style={styles.requestHistory}>
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f8f9fa' }}>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Title</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Subject</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Status</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Date</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {userRequests.map((req) => (
+                        <tr key={req._id} style={{ borderBottom: '1px solid #eee', transition: 'background 0.2s' }}>
+                          <td style={{ padding: '12px', verticalAlign: 'top' }}>
+                            <div style={{ fontWeight: '500' }}>{req.title}</div>
+                            {req.description && (
+                              <div style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '4px' }}>
+                                {req.description.length > 50 ? req.description.substring(0, 50) + '...' : req.description}
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px', verticalAlign: 'top' }}>
+                            <div>{req.subject}</div>
+                            <div style={{ fontSize: '0.85rem', color: '#6b7280' }}>
+                              Sem {req.semester} • {req.department}
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px', verticalAlign: 'top' }}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              {getStatusIcon(req.status)}
+                              <span style={{
+                                backgroundColor: req.status === 'approved' ? '#d1fae5' : 
+                                               req.status === 'rejected' ? '#fee2e2' : '#fef3c7',
+                                color: req.status === 'approved' ? '#065f46' : 
+                                       req.status === 'rejected' ? '#991b1b' : '#92400e',
+                                padding: '4px 8px',
+                                borderRadius: '12px',
+                                fontSize: '0.85rem',
+                                fontWeight: '500'
+                              }}>
+                                {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                              </span>
+                            </div>
+                            {req.teacherMessage && (
+                              <div style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '4px' }}>
+                                {req.teacherMessage}
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px', verticalAlign: 'top' }}>
+                            {new Date(req.createdAt).toLocaleDateString('en-IN', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </td>
+                          <td style={{ padding: '12px', verticalAlign: 'top' }}>
+                            <button
+                              onClick={() => window.open(`http://localhost:8000${req.fileUrl}`, '_blank')}
+                              style={{
+                                padding: '6px 12px',
+                                background: '#e5e7eb',
+                                border: 'none',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '0.85rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <FiFileText /> View File
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div style={{ marginTop: '1rem', textAlign: 'center', color: '#6b7280', fontSize: '0.9rem' }}>
+                  Showing {userRequests.length} request{userRequests.length !== 1 ? 's' : ''}
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>
+                <FiFileText size={48} style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                <p>No requests submitted yet.</p>
+                <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                  Use the "Upload Notes" feature to submit your first request!
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
+// Styles object
+const styles = {
+  profileContainer: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '2rem',
+    marginBottom: '2rem'
+  },
+  card: {
+    background: 'white',
+    borderRadius: '15px',
+    padding: '2rem',
+    boxShadow: '0 5px 15px rgba(0,0,0,0.05)',
+    marginBottom: '1.5rem'
+  },
+  cardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '2rem'
+  },
+  formGroup: {
+    marginBottom: '1.5rem'
+  },
+  formControl: {
+    width: '100%',
+    padding: '12px 16px',
+    border: '2px solid #e2e8f0',
+    borderRadius: '10px',
+    fontSize: '1rem'
+  },
+  profileValue: {
+    padding: '12px 0',
+    color: '#334155',
+    fontSize: '1rem'
+  },
+  roleBadge: {
+    padding: '4px 12px',
+    borderRadius: '20px',
+    display: 'inline-block',
+    textTransform: 'capitalize'
+  },
+  formActions: {
+    marginTop: '2rem'
+  },
+  accountActions: {
+    marginTop: '3rem',
+    paddingTop: '2rem',
+    borderTop: '1px solid #e2e8f0'
+  },
+  statsCard: {
+    background: 'white',
+    borderRadius: '15px',
+    padding: '2rem',
+    boxShadow: '0 5px 15px rgba(0,0,0,0.05)',
+    marginBottom: '1.5rem'
+  },
+  statsGrid: {
+    display: 'flex',
+    gap: '2rem',
+    marginTop: '1rem'
+  },
+  statItem: {
+    textAlign: 'center',
+    flex: 1
+  },
+  statValue: {
+    fontSize: '2rem',
+    fontWeight: 'bold',
+    color: '#4361ee'
+  },
+  statLabel: {
+    color: '#6c757d',
+    fontSize: '0.9rem'
+  },
+  btn: {
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '10px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    transition: 'all 0.2s'
+  },
+  btnPrimary: {
+    background: '#4361ee',
+    color: 'white'
+  },
+  btnPrimaryDisabled: {
+    background: '#94a3b8',
+    color: 'white',
+    opacity: 0.6,
+    cursor: 'not-allowed'
+  },
+  btnSecondary: {
+    background: '#e2e8f0',
+    color: '#334155',
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '10px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    transition: 'all 0.2s'
+  },
+  btnDanger: {
+    background: '#ef4444',
+    color: 'white',
+    padding: '10px 20px',
+    border: 'none',
+    borderRadius: '10px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '8px',
+    transition: 'all 0.2s',
+    marginLeft: '1rem'
+  },
+  loadingScreen: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    background: '#f5f7fb'
+  },
+  spinner: {
+    width: '40px',
+    height: '40px',
+    border: '3px solid #4361ee',
+    borderTop: '3px solid transparent',
+    borderRadius: '50%',
+    animation: 'spin 1s linear infinite',
+    marginBottom: '1rem'
+  },
+  requestHistory: {
+    // Table styles
+  }
+};
+
+// Add CSS animation
+const styleSheet = document.styleSheets[0];
+const keyframes = `
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+`;
+styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+
+// Media queries
+if (typeof window !== 'undefined') {
+  const mediaQuery = window.matchMedia('(max-width: 1024px)');
+  if (mediaQuery.matches) {
+    styles.profileContainer.gridTemplateColumns = '1fr';
+  }
+  
+  const mobileMediaQuery = window.matchMedia('(max-width: 768px)');
+  if (mobileMediaQuery.matches) {
+    styles.statsGrid.flexDirection = 'column';
+    styles.statsGrid.gap = '1rem';
+  }
+}
 
 export default Profile;

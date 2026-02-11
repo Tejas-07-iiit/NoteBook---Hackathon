@@ -8,7 +8,7 @@ const Requests = ({ onLogout }) => {
   // Get user from localStorage
   const userData = localStorage.getItem('user');
   const user = userData ? JSON.parse(userData) : null;
-  
+
   const [activeTab, setActiveTab] = useState('pending');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,7 @@ const Requests = ({ onLogout }) => {
     try {
       setLoading(true);
       let endpoint;
-      
+
       if (user?.role === 'student') {
         endpoint = '/requests/my';
       } else if (activeTab === 'pending') {
@@ -31,7 +31,7 @@ const Requests = ({ onLogout }) => {
       } else {
         endpoint = '/requests/reviewed';
       }
-      
+
       console.log(`Fetching requests from: ${endpoint}`);
       const response = await api.get(endpoint);
       console.log('Requests fetched:', response);
@@ -52,13 +52,13 @@ const Requests = ({ onLogout }) => {
     try {
       setActionLoading(id);
       console.log(`Approving request: ${id}`);
-      
+
       const response = await api.put(`/requests/${id}/approve`);
       console.log('Approval response:', response);
-      
+
       setMessage('Request approved successfully!');
       fetchRequests(); // Refresh the list
-      
+
     } catch (error) {
       console.error('Error approving request:', error);
       setMessage(`Error: ${error.response?.data?.message || 'Failed to approve'}`);
@@ -77,15 +77,15 @@ const Requests = ({ onLogout }) => {
     try {
       setActionLoading(id);
       console.log(`Rejecting request: ${id} with reason: ${reason}`);
-      
-      const response = await api.put(`/requests/${id}/reject`, { 
-        teacherMessage: reason.trim() 
+
+      const response = await api.put(`/requests/${id}/reject`, {
+        teacherMessage: reason.trim()
       });
       console.log('Rejection response:', response);
-      
+
       setMessage('Request rejected successfully!');
       fetchRequests(); // Refresh the list
-      
+
     } catch (error) {
       console.error('Error rejecting request:', error);
       setMessage(`Error: ${error.response?.data?.message || 'Failed to reject'}`);
@@ -96,28 +96,28 @@ const Requests = ({ onLogout }) => {
 
   const getStatusBadge = (status) => {
     const styles = {
-      pending: { 
-        bg: '#fef3c7', 
-        color: '#92400e', 
+      pending: {
+        bg: '#fef3c7',
+        color: '#92400e',
         icon: <FiClock />,
         text: 'Pending Review'
       },
-      approved: { 
-        bg: '#d1fae5', 
-        color: '#065f46', 
+      approved: {
+        bg: '#d1fae5',
+        color: '#065f46',
         icon: <FiCheck />,
         text: 'Approved'
       },
-      rejected: { 
-        bg: '#fee2e2', 
-        color: '#991b1b', 
+      rejected: {
+        bg: '#fee2e2',
+        color: '#991b1b',
         icon: <FiX />,
         text: 'Rejected'
       }
     };
-    
+
     const style = styles[status] || styles.pending;
-    
+
     return (
       <span style={{
         backgroundColor: style.bg,
@@ -152,13 +152,13 @@ const Requests = ({ onLogout }) => {
     return (
       <div className="dashboard-container">
         <Sidebar onLogout={onLogout} />
-        
+
         <div className="main-content">
-          <Header 
-            title="My Note Requests" 
+          <Header
+            title="My Note Requests"
             subtitle="Track your submitted note requests"
           />
-          
+
           {message && (
             <div style={{
               backgroundColor: message.includes('Error') ? '#fee2e2' : '#d1fae5',
@@ -170,7 +170,17 @@ const Requests = ({ onLogout }) => {
               {message}
             </div>
           )}
-          
+
+          <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              className="btn-primary"
+              onClick={() => window.location.href = '/upload'}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              <FiPlus /> New Request
+            </button>
+          </div>
+
           {loading ? (
             <div style={{ textAlign: 'center', padding: '3rem' }}>
               <div className="spinner"></div>
@@ -184,9 +194,9 @@ const Requests = ({ onLogout }) => {
                     <h3>{request.title}</h3>
                     {getStatusBadge(request.status)}
                   </div>
-                  
+
                   <p className="request-description">{request.description}</p>
-                  
+
                   <div className="request-details">
                     <div className="detail-item">
                       <FiBook /> <strong>Subject:</strong> {request.subject}
@@ -206,7 +216,7 @@ const Requests = ({ onLogout }) => {
                       <FiCalendar /> <strong>Submitted:</strong> {formatDate(request.createdAt)}
                     </div>
                   </div>
-                  
+
                   {request.status !== 'pending' && request.teacherMessage && (
                     <div className="teacher-feedback">
                       <strong>Teacher's Feedback:</strong> {request.teacherMessage}
@@ -217,15 +227,15 @@ const Requests = ({ onLogout }) => {
                       )}
                     </div>
                   )}
-                  
+
                   <div className="request-actions">
-                    <button 
+                    <button
                       className="btn btn-secondary"
                       onClick={() => window.open(`http://localhost:8000${request.fileUrl}`, '_blank')}
                     >
                       <FiEye /> View File
                     </button>
-                    
+
                     {request.status === 'approved' && (
                       <span style={{ color: '#10b981', fontWeight: '600' }}>
                         ✅ This note has been published to the library
@@ -242,7 +252,7 @@ const Requests = ({ onLogout }) => {
             </div>
           )}
         </div>
-        
+
         <style jsx>{`
           .request-card {
             background: white;
@@ -356,13 +366,13 @@ const Requests = ({ onLogout }) => {
   return (
     <div className="dashboard-container">
       <Sidebar onLogout={onLogout} />
-      
+
       <div className="main-content">
-        <Header 
-          title="Note Requests" 
+        <Header
+          title="Note Requests"
           subtitle="Review and manage student note requests"
         />
-        
+
         {message && (
           <div style={{
             backgroundColor: message.includes('Error') ? '#fee2e2' : '#d1fae5',
@@ -374,7 +384,7 @@ const Requests = ({ onLogout }) => {
             {message}
           </div>
         )}
-        
+
         {/* Tabs for Teacher/Admin */}
         <div className="tabs">
           <button
@@ -395,7 +405,7 @@ const Requests = ({ onLogout }) => {
             <FiCheck /> Reviewed Requests
           </button>
         </div>
-        
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '3rem' }}>
             <div className="spinner"></div>
@@ -409,15 +419,15 @@ const Requests = ({ onLogout }) => {
                   <div>
                     <h3>{request.title}</h3>
                     <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>
-                      Requested by: <strong>{request.requestedBy?.name}</strong> 
+                      Requested by: <strong>{request.requestedBy?.name}</strong>
                       ({request.requestedBy?.email})
                     </p>
                   </div>
                   {getStatusBadge(request.status)}
                 </div>
-                
+
                 <p className="request-description">{request.description}</p>
-                
+
                 <div className="request-details">
                   <div className="detail-item">
                     <FiBook /> <strong>Subject:</strong> {request.subject}
@@ -432,26 +442,26 @@ const Requests = ({ onLogout }) => {
                     <FiCalendar /> <strong>Submitted:</strong> {formatDate(request.createdAt)}
                   </div>
                 </div>
-                
+
                 {request.status !== 'pending' && request.teacherMessage && (
                   <div className="teacher-feedback">
                     <strong>Your Feedback:</strong> {request.teacherMessage}
                   </div>
                 )}
-                
+
                 <div className="request-actions">
                   <div>
-                    <button 
+                    <button
                       className="btn btn-secondary"
                       onClick={() => window.open(`http://localhost:8000${request.fileUrl}`, '_blank')}
                       style={{ marginRight: '10px' }}
                     >
                       <FiEye /> View File
                     </button>
-                    
+
                     {request.status === 'pending' && (
                       <>
-                        <button 
+                        <button
                           className="btn btn-success"
                           onClick={() => handleApprove(request._id)}
                           disabled={actionLoading === request._id}
@@ -459,7 +469,7 @@ const Requests = ({ onLogout }) => {
                         >
                           <FiCheck /> {actionLoading === request._id ? 'Approving...' : 'Approve'}
                         </button>
-                        <button 
+                        <button
                           className="btn btn-danger"
                           onClick={() => handleReject(request._id)}
                           disabled={actionLoading === request._id}
@@ -469,7 +479,7 @@ const Requests = ({ onLogout }) => {
                       </>
                     )}
                   </div>
-                  
+
                   {request.status === 'approved' && (
                     <span style={{ color: '#10b981', fontWeight: '600' }}>
                       ✅ Published to library
@@ -485,7 +495,7 @@ const Requests = ({ onLogout }) => {
           </div>
         )}
       </div>
-      
+
       <style jsx>{`
         .tabs {
           display: flex;

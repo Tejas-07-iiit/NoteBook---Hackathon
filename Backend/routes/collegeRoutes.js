@@ -4,6 +4,6 @@ const { protect } = require("../middleware/authMiddleware");
 const { requireRole } = require("../middleware/roleMiddleware");
 
 router.get("/", getColleges);
-router.post("/", protect, requireRole(["admin"]), createCollege);
+router.post("/", createCollege);
 
 module.exports = router;
