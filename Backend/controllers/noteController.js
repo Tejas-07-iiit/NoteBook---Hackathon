@@ -103,7 +103,7 @@ exports.uploadNote = async (req, res) => {
     res.status(201).json({ 
       message: "Note uploaded successfully", 
       note,
-      fileUrl: `http://localhost:8000${fileUrl}` // Return full URL for testing
+      fileUrl: `${req.protocol}://${req.get('host')}${fileUrl}` // Return full URL dynamically
     });
 
   } catch (err) {
