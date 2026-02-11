@@ -37,7 +37,7 @@ const Login = ({ onLogin }) => {
   }, [navigate]);
 
   // Fetch colleges
-  const fetchColleges = async () => {
+  const fetchColleges = React.useCallback(async () => {
     try {
       setCollegesLoading(true);
       console.log("Fetching colleges from:", `${API_URL}/colleges`);
@@ -59,13 +59,13 @@ const Login = ({ onLogin }) => {
     } finally {
       setCollegesLoading(false);
     }
-  };
+  }, [API_URL, registerData.collegeId]);
 
   useEffect(() => {
     if (!isLogin && colleges.length === 0) {
       fetchColleges();
     }
-  }, [isLogin]);
+  }, [isLogin, colleges.length, fetchColleges]);
 
   const handleLoginChange = (e) => {
     setLoginData({

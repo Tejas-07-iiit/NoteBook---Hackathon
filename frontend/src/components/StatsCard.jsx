@@ -1,5 +1,3 @@
-import React from 'react';
-
 const StatsCard = ({ icon, value, label, color }) => {
   const colorClasses = {
     note: { bg: '#e0e7ff', color: '#4361ee' },
@@ -11,7 +9,7 @@ const StatsCard = ({ icon, value, label, color }) => {
 
   return (
     <div className="stat-card">
-      <div className="stat-icon">
+      <div className="stat-icon" style={{ backgroundColor: selectedColor.bg, color: selectedColor.color }}>
         {icon}
       </div>
       <div className="stat-info">

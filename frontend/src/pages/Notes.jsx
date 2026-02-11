@@ -8,9 +8,9 @@ import api from '../services/api';
 import { FiPlus } from 'react-icons/fi';
 
 const Notes = () => {
-  
-const userData = localStorage.getItem('user');
-const user = userData ? JSON.parse(userData) : null;
+
+  const userData = localStorage.getItem('user');
+  const user = userData ? JSON.parse(userData) : null;
 
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,25 +24,21 @@ const user = userData ? JSON.parse(userData) : null;
     year: '',
     examType: ''
   });
-  
+
 
   const departments = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical'];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const types = ['note', 'pastpaper'];
   const examTypes = ['midsem', 'endsem', 'quiz', 'other'];
 
-  useEffect(() => {
-    fetchNotes();
-  }, [filters]);
-
-  const fetchNotes = async () => {
+  const fetchNotes = React.useCallback(async () => {
     try {
       setLoading(true);
       const queryParams = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
         if (value) queryParams.append(key, value);
       });
-      
+
       const response = await api.get(`/notes?${queryParams}`);
       setNotes(response);
     } catch (error) {
@@ -50,7 +46,11 @@ const user = userData ? JSON.parse(userData) : null;
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
+
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
 
   const handleFilterChange = (name, value) => {
     setFilters(prev => ({ ...prev, [name]: value }));
@@ -59,13 +59,13 @@ const user = userData ? JSON.parse(userData) : null;
   return (
     <div className="dashboard-container">
       <Sidebar />
-      
+
       <div className="main-content">
-        <Header 
-          title="Notes Library" 
+        <Header
+          title="Notes Library"
           subtitle="Browse and download study materials"
         />
-        
+
         <FilterBar
           filters={filters}
           onFilterChange={handleFilterChange}
@@ -74,11 +74,11 @@ const user = userData ? JSON.parse(userData) : null;
           types={types}
           examTypes={examTypes}
         />
-        
+
         <div className="section-header">
           <h2>All Study Materials ({notes.length})</h2>
           {(user?.role === 'teacher' || user?.role === 'admin') && (
-            <button 
+            <button
               className="btn btn-primary"
               onClick={() => setShowUploadModal(true)}
             >
@@ -86,7 +86,7 @@ const user = userData ? JSON.parse(userData) : null;
             </button>
           )}
         </div>
-        
+
         {loading ? (
           <div className="loading">Loading notes...</div>
         ) : notes.length > 0 ? (
@@ -101,7 +101,7 @@ const user = userData ? JSON.parse(userData) : null;
           </div>
         )}
       </div>
-      
+
       {showUploadModal && (
         <UploadModal onClose={() => setShowUploadModal(false)} onSuccess={fetchNotes} />
       )}

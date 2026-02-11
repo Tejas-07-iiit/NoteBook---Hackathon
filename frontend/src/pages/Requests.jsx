@@ -15,11 +15,7 @@ const Requests = ({ onLogout }) => {
   const [actionLoading, setActionLoading] = useState(null);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    fetchRequests();
-  }, [activeTab]);
-
-  const fetchRequests = async () => {
+  const fetchRequests = React.useCallback(async () => {
     try {
       setLoading(true);
       let endpoint;
@@ -42,7 +38,11 @@ const Requests = ({ onLogout }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeTab, user?.role]);
+
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
 
   const handleApprove = async (id) => {
     if (!window.confirm('Are you sure you want to approve this request?')) {
