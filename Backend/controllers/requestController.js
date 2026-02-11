@@ -1,5 +1,5 @@
-const NoteRequest = require("../models/NoteRequest.model");
-const Note = require("../models/Note.model");
+const NoteRequest = require("../Models/NoteRequest.model");
+const Note = require("../Models/Note.model");
 const fs = require("fs");
 
 exports.createRequest = async (req, res) => {
