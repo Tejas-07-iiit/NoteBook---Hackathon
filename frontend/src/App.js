@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Notes from './pages/Notes';
+import Summarizer from './pages/Summarizer';
 import Requests from './pages/Requests';
 import Profile from './pages/Profile';
 import Colleges from './pages/Colleges';
@@ -76,6 +77,14 @@ function App() {
               element={
                 isAuthenticated ?
                   <Notes onLogout={handleLogout} /> :
+                  <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/summarizer"
+              element={
+                isAuthenticated ?
+                  <Summarizer onLogout={handleLogout} /> :
                   <Navigate to="/login" />
               }
             />

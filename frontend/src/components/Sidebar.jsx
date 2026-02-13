@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  FiHome, FiBook, FiUpload, FiDownload,
+  FiHome, FiBook, FiUpload, FiDownload, FiCpu,
   FiUsers, FiSettings, FiLogOut
 } from 'react-icons/fi';
 
@@ -13,8 +13,11 @@ const Sidebar = ({ onLogout }) => {
   const navItems = [
     { path: '/', icon: <FiHome />, label: 'Dashboard' },
     { path: '/notes', icon: <FiBook />, label: 'Notes Library' },
+    { path: '/summarizer', icon: <FiCpu />, label: 'AI Summarizer' },
     { path: '/upload', icon: <FiUpload />, label: 'Upload Notes' },
     { path: '/colleges', icon: <FiHome />, label: 'Colleges' },
+    // Mobile Only Profile Item
+    { path: '/profile', icon: <FiSettings />, label: 'Profile', className: 'mobile-nav-item' },
   ];
 
   if (user?.role === 'student') {
@@ -42,7 +45,7 @@ const Sidebar = ({ onLogout }) => {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `nav-item ${isActive ? 'active' : ''}`
+              `nav-item ${isActive ? 'active' : ''} ${item.className || ''}`
             }
           >
             <span className="nav-icon">{item.icon}</span>

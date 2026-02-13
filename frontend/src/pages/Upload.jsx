@@ -3,7 +3,6 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import api from '../services/api';
 import { FiUpload, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
-import '../App.css';
 
 const Upload = ({ onLogout }) => {
     const userData = localStorage.getItem('user');

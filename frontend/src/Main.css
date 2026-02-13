@@ -622,8 +622,6 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    /* subtle fade to background when scrolling */
-    background: linear-gradient(to bottom, var(--bg-dark) 80%, transparent);
 }
 
 /* --- Left Side: Title & Subtitle --- */
@@ -664,7 +662,7 @@
 }
 
 .header-right .search-input {
-    width: 100%;
+    width: auto;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 10px;
@@ -678,7 +676,6 @@
     outline: none;
     background: rgba(255, 255, 255, 0.1);
     border-color: var(--primary);
-    width: 300px;
     /* Expands on focus for a cool effect */
 }
 
@@ -917,6 +914,10 @@
     top: 0;
     transition: all 0.3s ease;
     z-index: 1000;
+    /* allow scrolling when sidebar content overflows in any direction */
+    overflow-y: auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* --- Logo Section --- */
@@ -1972,6 +1973,22 @@ strong {
         background: rgba(255, 255, 255, 0.05);
     }
 
+    /* horizontal scrollbar for bottom-nav mode */
+    .sidebar::-webkit-scrollbar {
+        height: 4px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 4px;
+    }
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
     .nav-item.active {
         background: transparent;
         color: var(--primary);
@@ -1992,6 +2009,23 @@ strong {
         max-height: 85vh;
     }
 }
+
+/* --- Scrollbar styling for sidebar (vertical) --- */
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
 
 /* --- Tablet Responsive Fix (769px - 1024px) --- */
 @media (min-width: 769px) and (max-width: 1024px) {

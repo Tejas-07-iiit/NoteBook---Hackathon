@@ -3,7 +3,6 @@ import { getColleges, createCollege } from '../services/api';
 import { FiPlus } from 'react-icons/fi';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import '../App.css';
 
 const Colleges = ({ onLogout }) => {
     const [colleges, setColleges] = useState([]);

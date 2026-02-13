@@ -68,10 +68,11 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/colleges", require("./routes/collegeRoutes"));
 app.use("/api/notes", require("./routes/noteRoutes"));
 app.use("/api/requests", require("./routes/requestRoutes"));
+app.use("/api/summarize", require("./routes/summarizeRoutes"));
 
 // Health check
 app.get("/", (req, res) => {
-  res.json({ 
+  res.json({
     message: "Notebook Backend Running...",
     cors: {
       allowedOrigins: allowedOrigins,
@@ -84,18 +85,18 @@ app.get("/", (req, res) => {
 // Error handling
 app.use((err, req, res, next) => {
   console.error("Server Error:", err);
-  
+
   // Handle CORS errors
   if (err.message.includes('CORS')) {
-    return res.status(403).json({ 
+    return res.status(403).json({
       message: "CORS Error",
       error: err.message,
       allowedOrigins: allowedOrigins,
       yourOrigin: req.headers.origin
     });
   }
-  
-  res.status(500).json({ 
+
+  res.status(500).json({
     message: "Internal Server Error",
     error: err.message,
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
