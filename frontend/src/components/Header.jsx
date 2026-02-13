@@ -27,12 +27,6 @@ const Header = ({ title, subtitle }) => {
 
 
         <div className="user-info">
-          <button className="theme-btn" onClick={toggleTheme}>
-            {theme === 'light' ? <FiMoon /> : <FiSun />}
-          </button>
-          <button className="notification-btn">
-            <FiBell />
-          </button>
           <div className="user-avatar">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
           </div>

@@ -8,11 +8,8 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     // Check local storage for saved theme
     const savedTheme = localStorage.getItem('theme');
-    // Check system preference if no saved theme
-    if (!savedTheme) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    return savedTheme;
+    // Default to dark mode
+    return savedTheme || 'dark';
   });
 
   useEffect(() => {

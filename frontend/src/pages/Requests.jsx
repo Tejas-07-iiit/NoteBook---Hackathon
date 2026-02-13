@@ -143,13 +143,15 @@ const Requests = ({ onLogout }) => {
         <Sidebar onLogout={onLogout} />
 
         <div className="main-content">
+          <Header
+            title="My Note Requests"
+            subtitle="Track your submitted note requests"
+          />
+
           <div className="d-flex justify-between align-center mb-4">
-            <Header
-              title="My Note Requests"
-              subtitle="Track your submitted note requests"
-            />
+            <h2 className="text-xl font-bold">My Requests</h2>
             <button
-              className="btn btn-primary"
+              className="btn btn-primary" style={{ width: "208px" }}
               onClick={() => window.location.href = '/upload'}
             >
               <FiPlus /> New Request

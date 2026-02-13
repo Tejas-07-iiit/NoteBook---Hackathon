@@ -9,6 +9,7 @@ const Upload = ({ onLogout }) => {
     const userData = localStorage.getItem('user');
     const user = userData ? JSON.parse(userData) : null;
     const isStudent = user?.role === 'student';
+    const isTeacher = user?.role === 'teacher';
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -25,6 +26,28 @@ const Upload = ({ onLogout }) => {
         year: '',
         examType: 'other',
     });
+
+    // Safety check for legacy admin users
+    if (!isStudent && !isTeacher) {
+        return (
+            <div className="dashboard-container">
+                <Sidebar onLogout={onLogout} />
+                <div className="main-content">
+                    <div className="alert alert-error">
+                        <h3>Invalid Account Role</h3>
+                        <p>Your account has a role of "<strong>{user?.role}</strong>" which is no longer supported.</p>
+                        <p>Please <strong>Logout</strong> and register a new <strong>Student</strong> or <strong>Teacher</strong> account.</p>
+                        <button className="btn btn-primary mt-4" onClick={onLogout}>Logout Now</button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    console.log("Upload Page Debug:");
+    console.log("User Data:", user);
+    console.log("Role:", user?.role);
+    console.log("Is Student?", isStudent);
 
     const departments = ['Computer Science', 'Electronics', 'Mechanical', 'Civil', 'Electrical'];
     const semesters = [1, 2, 3, 4, 5, 6, 7, 8];

@@ -8,7 +8,7 @@ import Profile from './pages/Profile';
 import Colleges from './pages/Colleges';
 import Upload from './pages/Upload';
 import { ThemeProvider } from './context/ThemeContext';
-import './App.css';
+import './Main.css'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -18,7 +18,7 @@ function App() {
     // Check if user is logged in
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
-    
+
     if (token && user) {
       setIsAuthenticated(true);
     }
@@ -49,74 +49,74 @@ function App() {
 
   return (
     <ThemeProvider>
-    <Router>
-      <div className="App">
-        <Routes>
-          {/* Public route - redirect to dashboard if already logged in */}
-          <Route 
-            path="/login" 
-            element={
-              isAuthenticated ? 
-              <Navigate to="/" /> : 
-              <Login onLogin={handleLogin} />
-            } 
-          />
-          
-          {/* Protected routes */}
-          <Route 
-            path="/" 
-            element={
-              isAuthenticated ? 
-              <Dashboard onLogout={handleLogout} /> : 
-              <Navigate to="/login" />
-            } 
-          />
-          <Route 
-            path="/notes" 
-            element={
-              isAuthenticated ? 
-              <Notes onLogout={handleLogout} /> : 
-              <Navigate to="/login" />
-            } 
-          />
-          <Route 
-            path="/requests" 
-            element={
-              isAuthenticated ? 
-              <Requests onLogout={handleLogout} /> : 
-              <Navigate to="/login" />
-            } 
-          />
-          <Route 
-            path="/profile" 
-            element={
-              isAuthenticated ? 
-              <Profile onLogout={handleLogout} /> : 
-              <Navigate to="/login" />
-            } 
-          />
-          <Route 
-            path="/colleges" 
-            element={
-              isAuthenticated ? 
-              <Colleges onLogout={handleLogout} /> : 
-              <Navigate to="/login" />
-            } 
-          />
-          <Route 
-            path="/upload" 
-            element={
-              isAuthenticated ? 
-              <Upload onLogout={handleLogout} /> : 
-              <Navigate to="/login" />
-            } 
-          />
-          
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
-        </Routes>
-      </div>
-    </Router>
+      <Router>
+        <div className="App">
+          <Routes>
+            {/* Public route - redirect to dashboard if already logged in */}
+            <Route
+              path="/login"
+              element={
+                isAuthenticated ?
+                  <Navigate to="/" /> :
+                  <Login onLogin={handleLogin} />
+              }
+            />
+
+            {/* Protected routes */}
+            <Route
+              path="/"
+              element={
+                isAuthenticated ?
+                  <Dashboard onLogout={handleLogout} /> :
+                  <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/notes"
+              element={
+                isAuthenticated ?
+                  <Notes onLogout={handleLogout} /> :
+                  <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/requests"
+              element={
+                isAuthenticated ?
+                  <Requests onLogout={handleLogout} /> :
+                  <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                isAuthenticated ?
+                  <Profile onLogout={handleLogout} /> :
+                  <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/colleges"
+              element={
+                isAuthenticated ?
+                  <Colleges onLogout={handleLogout} /> :
+                  <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/upload"
+              element={
+                isAuthenticated ?
+                  <Upload onLogout={handleLogout} /> :
+                  <Navigate to="/login" />
+              }
+            />
+
+            {/* Catch all route */}
+            <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} />} />
+          </Routes>
+        </div>
+      </Router>
     </ThemeProvider>
   );
 }
