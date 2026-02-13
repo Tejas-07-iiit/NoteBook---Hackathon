@@ -57,7 +57,7 @@ exports.register = async (req, res) => {
       name: name.trim(),
       email: email.trim().toLowerCase(),
       password: hashed,
-      role: role || "student",
+      role: role && role !== "admin" ? role : "student",
       collegeId
     });
 
@@ -77,9 +77,9 @@ exports.register = async (req, res) => {
     });
   } catch (err) {
     console.error("Registration error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error during registration",
-      error: err.message 
+      error: err.message
     });
   }
 };
@@ -121,9 +121,9 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error during login",
-      error: err.message 
+      error: err.message
     });
   }
 };
@@ -134,17 +134,17 @@ exports.getMe = async (req, res) => {
     const user = await User.findById(req.user._id)
       .select("-password")
       .populate("collegeId", "collegeName collegeCode");
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     res.json(user);
   } catch (err) {
     console.error("Get me error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error fetching user profile",
-      error: err.message 
+      error: err.message
     });
   }
 };
@@ -159,7 +159,7 @@ exports.updateProfile = async (req, res) => {
     if (name && !name.trim()) {
       return res.status(400).json({ message: "Name cannot be empty" });
     }
-    
+
     if (email) {
       if (!email.trim()) {
         return res.status(400).json({ message: "Email cannot be empty" });
@@ -167,9 +167,9 @@ exports.updateProfile = async (req, res) => {
       if (!validateEmail(email.trim())) {
         return res.status(400).json({ message: "Invalid email format" });
       }
-      
+
       // Check if email is already taken by another user
-      const existingUser = await User.findOne({ 
+      const existingUser = await User.findOne({
         email: email.trim().toLowerCase(),
         _id: { $ne: userId }
       });
@@ -202,9 +202,9 @@ exports.updateProfile = async (req, res) => {
     });
   } catch (err) {
     console.error("Update profile error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error updating profile",
-      error: err.message 
+      error: err.message
     });
   }
 };
@@ -251,9 +251,9 @@ exports.changePassword = async (req, res) => {
     res.json({ message: "Password changed successfully" });
   } catch (err) {
     console.error("Change password error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error changing password",
-      error: err.message 
+      error: err.message
     });
   }
 };
@@ -262,7 +262,7 @@ exports.changePassword = async (req, res) => {
 exports.getUserStats = async (req, res) => {
   try {
     const userId = req.user._id;
-    
+
     // You can add logic here to count user's notes, requests, etc.
     // For now, returning placeholder stats
     const stats = {
@@ -275,9 +275,9 @@ exports.getUserStats = async (req, res) => {
     res.json(stats);
   } catch (err) {
     console.error("Get stats error:", err);
-    res.status(500).json({ 
+    res.status(500).json({
       message: "Server error fetching statistics",
-      error: err.message 
+      error: err.message
     });
   }
 };

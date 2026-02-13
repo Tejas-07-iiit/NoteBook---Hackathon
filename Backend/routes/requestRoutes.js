@@ -30,10 +30,10 @@ router.get("/stats", protect, requireRole(["student"]), getRequestStats);
 router.get("/history/:studentId", protect, getStudentRequestHistory);
 
 // Teacher/Admin routes
-router.get("/pending", protect, requireRole(["teacher", "admin"]), getPendingRequests);
-router.get("/reviewed", protect, requireRole(["teacher", "admin"]), getReviewedRequests);
+router.get("/pending", protect, requireRole(["teacher"]), getPendingRequests);
+router.get("/reviewed", protect, requireRole(["teacher"]), getReviewedRequests);
 
-router.put("/:id/approve", protect, requireRole(["teacher", "admin"]), approveRequest);
-router.put("/:id/reject", protect, requireRole(["teacher", "admin"]), rejectRequest);
+router.put("/:id/approve", protect, requireRole(["teacher"]), approveRequest);
+router.put("/:id/reject", protect, requireRole(["teacher"]), rejectRequest);
 
 module.exports = router;

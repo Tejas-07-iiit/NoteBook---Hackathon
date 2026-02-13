@@ -5,7 +5,7 @@ const fs = require("fs");
 exports.uploadNote = async (req, res) => {
   console.log("======= UPLOAD NOTE START =======");
   console.log("📤 Upload request received");
-  
+
   try {
     console.log("📝 Request body:", JSON.stringify(req.body, null, 2));
     console.log("📎 Uploaded file info:", req.file ? {
@@ -16,7 +16,7 @@ exports.uploadNote = async (req, res) => {
       path: req.file.path,
       destination: req.file.destination
     } : 'NO FILE');
-    
+
     console.log("👤 User making request:", req.user ? {
       _id: req.user._id,
       name: req.user.name,
@@ -34,7 +34,7 @@ exports.uploadNote = async (req, res) => {
 
     if (!req.file) {
       console.log("❌ ERROR: No file uploaded");
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: "File is required",
         details: "No file was uploaded"
       });
@@ -49,7 +49,7 @@ exports.uploadNote = async (req, res) => {
 
     if (!title || !subject || !department || !semester) {
       console.log("❌ ERROR: Missing required fields");
-      
+
       // Delete the uploaded file if validation fails
       if (req.file.path) {
         console.log("🗑️ Deleting uploaded file due to validation failure...");
@@ -58,8 +58,8 @@ exports.uploadNote = async (req, res) => {
           else console.log("✅ File deleted successfully");
         });
       }
-      
-      return res.status(400).json({ 
+
+      return res.status(400).json({
         message: "Title, subject, department, and semester are required",
         missing: {
           title: !title,
@@ -71,7 +71,7 @@ exports.uploadNote = async (req, res) => {
     }
 
     console.log("✅ All validations passed");
-    
+
     const fileUrl = `/uploads/${req.file.filename}`;
     console.log("🔗 File URL for access:", fileUrl);
 
@@ -100,8 +100,8 @@ exports.uploadNote = async (req, res) => {
 
     console.log("======= UPLOAD NOTE SUCCESS =======");
 
-    res.status(201).json({ 
-      message: "Note uploaded successfully", 
+    res.status(201).json({
+      message: "Note uploaded successfully",
       note,
       fileUrl: `${req.protocol}://${req.get('host')}${fileUrl}` // Return full URL dynamically
     });
@@ -112,18 +112,18 @@ exports.uploadNote = async (req, res) => {
     console.error("Error message:", err.message);
     console.error("Error code:", err.code);
     console.error("Error stack:", err.stack);
-    
+
     if (err.name === 'ValidationError') {
       console.error("Mongoose validation errors:", err.errors);
     }
-    
+
     if (err.name === 'MongoError') {
       console.error("MongoDB error code:", err.code);
     }
-    
+
     console.error("Full error object:", JSON.stringify(err, null, 2));
     console.error("======= UPLOAD NOTE END =======");
-    
+
     // Delete the uploaded file if there's an error
     if (req.file && req.file.path) {
       console.log("🗑️ Attempting to delete uploaded file after error...");
@@ -132,9 +132,9 @@ exports.uploadNote = async (req, res) => {
         else console.log("✅ File deleted after error");
       });
     }
-    
-    res.status(500).json({ 
-      message: "Error uploading note", 
+
+    res.status(500).json({
+      message: "Error uploading note",
       error: err.message,
       errorType: err.name,
       ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
@@ -182,9 +182,9 @@ exports.getNotes = async (req, res) => {
 
   } catch (err) {
     console.error("❌ Get notes error:", err);
-    res.status(500).json({ 
-      message: "Error fetching notes", 
-      error: err.message 
+    res.status(500).json({
+      message: "Error fetching notes",
+      error: err.message
     });
   }
 };
@@ -192,7 +192,7 @@ exports.getNotes = async (req, res) => {
 exports.deleteNote = async (req, res) => {
   try {
     console.log("🗑️ Delete note request for ID:", req.params.id);
-    
+
     const note = await Note.findById(req.params.id);
 
     if (!note) {
@@ -209,7 +209,7 @@ exports.deleteNote = async (req, res) => {
     });
 
     // Check permission
-    if (req.user.role !== "teacher" && req.user.role !== "admin") {
+    if (req.user.role !== "teacher") {
       console.log("❌ User not authorized to delete");
       return res.status(403).json({ message: "Not authorized to delete notes" });
     }
@@ -220,7 +220,7 @@ exports.deleteNote = async (req, res) => {
     if (note.fileUrl) {
       const filePath = path.join(__dirname, '..', note.fileUrl);
       console.log("Looking for file at:", filePath);
-      
+
       if (fs.existsSync(filePath)) {
         console.log("✅ File exists, deleting...");
         fs.unlinkSync(filePath);
@@ -239,9 +239,9 @@ exports.deleteNote = async (req, res) => {
 
   } catch (err) {
     console.error("❌ Delete note error:", err);
-    res.status(500).json({ 
-      message: "Error deleting note", 
-      error: err.message 
+    res.status(500).json({
+      message: "Error deleting note",
+      error: err.message
     });
   }
 };

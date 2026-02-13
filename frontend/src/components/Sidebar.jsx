@@ -23,7 +23,7 @@ const Sidebar = ({ onLogout }) => {
     );
   }
 
-  if (user?.role === 'teacher' || user?.role === 'admin') {
+  if (user?.role === 'teacher') {
     navItems.push(
       { path: '/requests', icon: <FiUsers />, label: 'Review Requests' }
     );
