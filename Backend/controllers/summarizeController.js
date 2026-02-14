@@ -34,12 +34,16 @@ const summarizeNotes = async (req, res) => {
                 }
 
                 // Construct absolute path: __dirname is 'controllers', so we go up one level to 'Backend'
+                // This covers both "uploads/file.pdf" and "/uploads/file.pdf" logic
                 filePath = path.join(__dirname, "..", relativePath);
             } else if (filePath.startsWith('/') && !fs.existsSync(filePath)) {
-                // Handle case where path is stored as "/uploads/..." but treated as absolute by path.isAbsolute on Linux
-                // This block catches paths that start with / but don't exist at the root level
+                // Even if it starts with /, on Linux it might be treated as absolute root.
+                // We check if it exists. If not, try relative to Backend root.
                 let relativePath = filePath.substring(1);
-                filePath = path.join(__dirname, "..", relativePath);
+                const potentialPath = path.join(__dirname, "..", relativePath);
+                if (fs.existsSync(potentialPath)) {
+                    filePath = potentialPath;
+                }
             }
 
             console.log(`Processing file: ${filePath}`);
