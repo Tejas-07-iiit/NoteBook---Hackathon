@@ -78,7 +78,7 @@ const Notes = () => {
         <div className="section-header">
           <h2>All Study Materials ({notes.length})</h2>
           {(user?.role === 'teacher' || user?.role === 'admin') && (
-            <button
+            <button style={{ width: "250px" }}
               className="btn btn-primary"
               onClick={() => setShowUploadModal(true)}
             >

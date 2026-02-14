@@ -6,14 +6,14 @@ const FilterBar = ({ filters, onFilterChange, departments, semesters, types, exa
     <div className="filter-bar">
       <div className="search-box">
         <FiSearch className="search-icon" />
-        <input
+        <input style={{ width: "601px" }}
           type="text"
           placeholder="Search notes by title or subject..."
           value={filters.search}
           onChange={(e) => onFilterChange('search', e.target.value)}
         />
       </div>
-      
+
       <div className="filter-group">
         <select
           className="form-control"
@@ -26,7 +26,7 @@ const FilterBar = ({ filters, onFilterChange, departments, semesters, types, exa
           ))}
         </select>
       </div>
-      
+
       <div className="filter-group">
         <select
           className="form-control"
@@ -39,7 +39,7 @@ const FilterBar = ({ filters, onFilterChange, departments, semesters, types, exa
           ))}
         </select>
       </div>
-      
+
       <div className="filter-group">
         <select
           className="form-control"
@@ -51,7 +51,7 @@ const FilterBar = ({ filters, onFilterChange, departments, semesters, types, exa
           <option value="pastpaper">Past Papers</option>
         </select>
       </div>
-      
+
       {filters.type === 'pastpaper' && (
         <div className="filter-group">
           <select
@@ -68,8 +68,8 @@ const FilterBar = ({ filters, onFilterChange, departments, semesters, types, exa
           </select>
         </div>
       )}
-      
-      <button 
+
+      <button
         className="btn btn-secondary"
         onClick={() => {
           // Reset all filters
